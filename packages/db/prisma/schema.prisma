@@ -18,8 +18,8 @@ model AiNews {
   publishedAt DateTime
   tags        String[]
   
-  // Vector embedding for semantic search
-  embedding   Unsupported("vector(1536)")?
+  // Vector embedding for semantic search (commented out until pgvector is enabled)
+  // embedding   Unsupported("vector(1536)")?
   
   // Metadata
   createdAt   DateTime @default(now())
