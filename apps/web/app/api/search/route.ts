@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
-import OpenAI from 'openai'
 
 const prisma = new PrismaClient()
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-})
 
 export async function GET(request: NextRequest) {
   try {
@@ -21,21 +16,9 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Generate embedding for search query
-    const embeddingResponse = await openai.embeddings.create({
-      model: 'text-embedding-3-small',
-      input: query
-    })
-
-    const queryEmbedding = embeddingResponse.data[0].embedding
-
-    // Perform vector search (simplified - just keyword search for now)
-    const results = []
-
-    // Also perform keyword search as fallback
-    const keywordResults = await prisma.aiNews.findMany({
+    // Perform keyword search
+    const results = await prisma.aiNews.findMany({
       where: {
-        processed: true,
         OR: [
           { title: { contains: query, mode: 'insensitive' } },
           { summary: { contains: query, mode: 'insensitive' } },
@@ -43,19 +26,22 @@ export async function GET(request: NextRequest) {
         ]
       },
       take: limit,
-      orderBy: { publishedAt: 'desc' }
+      orderBy: { publishedAt: 'desc' },
+      select: {
+        id: true,
+        title: true,
+        summary: true,
+        url: true,
+        source: true,
+        publishedAt: true,
+        tags: true
+      }
     })
 
-    // Combine and deduplicate results
-    const combinedResults = [...results, ...keywordResults]
-    const uniqueResults = combinedResults.filter((item, index, self) =>
-      index === self.findIndex(t => t.id === item.id)
-    )
-
     const response = {
-      results: uniqueResults.slice(0, limit),
+      results,
       query,
-      total: uniqueResults.length
+      total: results.length
     }
 
     return NextResponse.json(response)
