@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL")
+}
+
+model AiNews {
+  id          String   @id @default(cuid())
+  title       String
+  content     String?
+  summary     String
+  url         String   @unique
+  source      String
+  sourceUrl   String?
+  publishedAt DateTime
+  tags        String[]
+  
+  // Vector embedding for semantic search
+  embedding   Unsupported("vector(1536)")?
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  processed   Boolean  @default(false)
+  
+  @@map("ai_news")
+  @@index([publishedAt])
+  @@index([source])
+  @@index([processed])
+}
+
+model FeedSource {
+  id          String   @id @default(cuid())
+  name        String
+  url         String   @unique
+  type        String   // rss, atom, rest
+  active      Boolean  @default(true)
+  lastFetch   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("feed_sources")
+}

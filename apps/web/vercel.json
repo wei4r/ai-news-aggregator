@@ -1,0 +1,20 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/fetch-news",
+      "schedule": "*/30 * * * *"
+    },
+    {
+      "path": "/api/cron/summarize", 
+      "schedule": "5-59/30 * * * *"
+    }
+  ],
+  "functions": {
+    "app/api/cron/fetch-news/route.ts": {
+      "maxDuration": 300
+    },
+    "app/api/cron/summarize/route.ts": {
+      "maxDuration": 300
+    }
+  }
+}
