@@ -11,10 +11,10 @@
   ],
   "functions": {
     "app/api/cron/fetch-news/route.ts": {
-      "maxDuration": 300
+      "maxDuration": 60
     },
     "app/api/cron/summarize/route.ts": {
-      "maxDuration": 300
+      "maxDuration": 60
     }
   }
 }
