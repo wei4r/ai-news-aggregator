@@ -1,4 +1,7 @@
 import { NextResponse } from 'next/server'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 export async function GET(request: Request) {
   // Verify cron secret for security
@@ -8,11 +11,13 @@ export async function GET(request: Request) {
   }
 
   try {
-    // For now, return a simple success message
-    // The manual fetch script can be used instead
+    // Simple health check for now
+    const count = await prisma.aiNews.count()
+    
     return NextResponse.json({
       success: true,
-      message: 'Use manual-fetch.js script for now',
+      message: 'Cron job placeholder - manual fetching required',
+      articleCount: count,
       timestamp: new Date().toISOString()
     })
 

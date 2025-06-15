@@ -1,4 +1,7 @@
 import { NextResponse } from 'next/server'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization')
@@ -7,10 +10,15 @@ export async function GET(request: Request) {
   }
 
   try {
-    // For now, return a simple success message
+    // Count articles without summaries
+    const unprocessed = await prisma.aiNews.count({
+      where: { summary: '' }
+    })
+    
     return NextResponse.json({
       success: true,
-      message: 'Summarization service temporarily disabled',
+      message: 'Summarization service placeholder',
+      unprocessedCount: unprocessed,
       timestamp: new Date().toISOString()
     })
 
